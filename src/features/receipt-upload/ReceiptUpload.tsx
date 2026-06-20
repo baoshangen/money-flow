@@ -8,7 +8,13 @@ import TransactionForm, { type TxDraft, emptyDraft } from "../transactions/Trans
 
 type Phase = "idle" | "uploading" | "extracting" | "review" | "error";
 
-export default function ReceiptUpload({ label = "📷 Up ảnh hóa đơn" }: { label?: string }) {
+export default function ReceiptUpload({
+  label = "📷 Up ảnh hóa đơn",
+  variant = "primary",
+}: {
+  label?: string;
+  variant?: "primary" | "white";
+}) {
   const { user } = useAuth();
   const { data: categories = [] } = useCategories();
   const fileRef = useRef<HTMLInputElement>(null);
@@ -77,7 +83,9 @@ export default function ReceiptUpload({ label = "📷 Up ảnh hóa đơn" }: { 
           e.target.value = "";
         }}
       />
-      <Button onClick={() => fileRef.current?.click()}>{label}</Button>
+      <Button variant={variant} onClick={() => fileRef.current?.click()}>
+        {label}
+      </Button>
 
       <Modal
         open={phase === "uploading" || phase === "extracting"}

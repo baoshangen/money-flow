@@ -42,7 +42,7 @@ export function Button({
   children: ReactNode;
   onClick?: () => void;
   type?: "button" | "submit";
-  variant?: "primary" | "ghost" | "danger";
+  variant?: "primary" | "ghost" | "danger" | "white";
   disabled?: boolean;
 }) {
   const styles = {
@@ -50,6 +50,7 @@ export function Button({
       "bg-gradient-to-r from-brand-400 to-brand-500 text-white shadow-md shadow-brand-500/20 hover:from-brand-500 hover:to-brand-600",
     ghost: "border border-white/70 bg-white/50 text-slate-600 hover:bg-white/80",
     danger: "text-red-500 hover:bg-red-50",
+    white: "bg-white text-brand-600 shadow-md hover:bg-white/90",
   }[variant];
   return (
     <button
@@ -103,6 +104,22 @@ export function Field({
       <span className="mb-1 block text-xs font-medium text-slate-500">{label}</span>
       {children}
     </label>
+  );
+}
+
+// Badge tròn cam (gợi nhớ huy hiệu điểm "8.45" trong ảnh tham khảo).
+export function CircleBadge({
+  value,
+  caption,
+}: {
+  value: string;
+  caption?: string;
+}) {
+  return (
+    <div className="flex h-20 w-20 flex-col items-center justify-center rounded-full bg-white/25 text-white ring-2 ring-white/40 backdrop-blur-sm">
+      <span className="text-xl font-extrabold leading-none">{value}</span>
+      {caption && <span className="mt-0.5 text-[10px] opacity-90">{caption}</span>}
+    </div>
   );
 }
 

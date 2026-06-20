@@ -27,8 +27,12 @@ body {
   margin: 0;
   font-family: var(--font-sans);
   color: #1e293b;
-  /* Nền gradient peach ấm, phủ kín viewport kể cả khi cuộn */
-  background: linear-gradient(135deg, #f6e7da 0%, #ead0bb 100%);
+  /* Nền peach ấm + lớp vân chấm mờ (gợi cảm giác "halftone" như ảnh tham khảo) */
+  background-color: #f0dcc9;
+  background-image:
+    radial-gradient(circle at 1px 1px, rgba(150, 100, 70, 0.05) 1px, transparent 0),
+    linear-gradient(135deg, #f6e7da 0%, #ead0bb 100%);
+  background-size: 22px 22px, cover;
   background-attachment: fixed;
   min-height: 100vh;
 }

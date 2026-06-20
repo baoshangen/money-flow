@@ -21,7 +21,8 @@ import {
 } from "../lib/queries";
 import { summarize, financialHealth } from "../lib/insights";
 import { formatMoney, formatDate } from "../lib/format";
-import { PageHeader, Card } from "../components/ui";
+import { Card, CircleBadge } from "../components/ui";
+import { useAuth } from "../contexts/AuthContext";
 import ReceiptUpload from "../features/receipt-upload/ReceiptUpload";
 
 // Dải màu cam/amber theo gu peach của app.
@@ -32,6 +33,7 @@ function monthKey(iso: string) {
 }
 
 export default function Dashboard() {
+  const { user } = useAuth();
   const { data: accounts = [] } = useAccounts();
   const { data: holdings = [] } = useHoldings();
   const { data: txs = [] } = useTransactions();
@@ -101,14 +103,35 @@ export default function Dashboard() {
 
   return (
     <>
-      <PageHeader title="Tổng quan" action={<ReceiptUpload />} />
+      {/* Banner hero gradient cam — điểm nhấn đầu trang như ảnh tham khảo */}
+      <div className="relative mb-5 overflow-hidden rounded-3xl bg-gradient-to-br from-brand-400 to-brand-600 p-6 text-white shadow-lg shadow-brand-500/25">
+        {/* Lớp vân chấm mờ trang trí */}
+        <div
+          className="pointer-events-none absolute inset-0 opacity-20"
+          style={{
+            backgroundImage: "radial-gradient(circle at 1px 1px, rgba(255,255,255,0.5) 1px, transparent 0)",
+            backgroundSize: "18px 18px",
+          }}
+        />
+        <div className="relative flex items-center justify-between gap-4">
+          <div>
+            <div className="text-sm font-medium text-white/80">
+              Xin chào, {user?.email?.split("@")[0] ?? "bạn"} 👋
+            </div>
+            <div className="mt-1 text-xs uppercase tracking-wide text-white/70">Tài sản ròng</div>
+            <div className="text-3xl font-extrabold sm:text-4xl">{formatMoney(netWorth)}</div>
+            <div className="mt-3">
+              <ReceiptUpload label="📷 Up ảnh hóa đơn" variant="white" />
+            </div>
+          </div>
+          <div className="hidden sm:block">
+            <CircleBadge value={`${Math.round(health.savingsRate * 100)}%`} caption="tiết kiệm" />
+          </div>
+        </div>
+      </div>
 
       {/* Hàng thẻ tổng */}
-      <div className="mb-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <Card>
-          <div className="text-sm text-slate-500">Tài sản ròng</div>
-          <div className="mt-1 text-2xl font-bold text-slate-900">{formatMoney(netWorth)}</div>
-        </Card>
+      <div className="mb-5 grid gap-4 sm:grid-cols-3">
         <Card>
           <div className="text-sm text-slate-500">Tiền mặt</div>
           <div className="mt-1 text-2xl font-bold text-brand-500">{formatMoney(cashTotal)}</div>
@@ -120,9 +143,6 @@ export default function Dashboard() {
         <Card>
           <div className="text-sm text-slate-500">Sức khỏe tài chính (tháng)</div>
           <div className={`mt-1 text-2xl font-bold ${healthColor}`}>{health.label}</div>
-          <div className="text-xs text-slate-400">
-            Tiết kiệm {Math.round(health.savingsRate * 100)}%
-          </div>
         </Card>
       </div>
 
