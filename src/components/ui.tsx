@@ -8,13 +8,14 @@ export function PageHeader({
   action?: ReactNode;
 }) {
   return (
-    <div className="mb-6 flex items-center justify-between">
+    <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
       <h1 className="text-2xl font-bold text-slate-800">{title}</h1>
       {action}
     </div>
   );
 }
 
+// Thẻ kính mờ (glassmorphism) bo góc lớn, đổ bóng mềm — theo ảnh tham khảo.
 export function Card({
   children,
   className = "",
@@ -23,7 +24,9 @@ export function Card({
   className?: string;
 }) {
   return (
-    <div className={`rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-100 ${className}`}>
+    <div
+      className={`rounded-3xl bg-white/70 p-5 shadow-[0_8px_30px_rgba(120,80,50,0.08)] ring-1 ring-white/60 backdrop-blur-md ${className}`}
+    >
       {children}
     </div>
   );
@@ -43,8 +46,9 @@ export function Button({
   disabled?: boolean;
 }) {
   const styles = {
-    primary: "bg-emerald-600 text-white hover:bg-emerald-700",
-    ghost: "border border-slate-200 text-slate-600 hover:bg-slate-50",
+    primary:
+      "bg-gradient-to-r from-brand-400 to-brand-500 text-white shadow-md shadow-brand-500/20 hover:from-brand-500 hover:to-brand-600",
+    ghost: "border border-white/70 bg-white/50 text-slate-600 hover:bg-white/80",
     danger: "text-red-500 hover:bg-red-50",
   }[variant];
   return (
@@ -52,7 +56,7 @@ export function Button({
       type={type}
       onClick={onClick}
       disabled={disabled}
-      className={`rounded-lg px-3 py-2 text-sm font-medium transition disabled:opacity-60 ${styles}`}
+      className={`rounded-full px-4 py-2 text-sm font-semibold transition disabled:opacity-60 ${styles}`}
     >
       {children}
     </button>
@@ -73,14 +77,14 @@ export function Modal({
   if (!open) return null;
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 p-4"
+      className="fixed inset-0 z-50 flex items-end justify-center bg-black/30 p-0 backdrop-blur-sm sm:items-center sm:p-4"
       onClick={onClose}
     >
       <div
-        className="w-full max-w-md rounded-2xl bg-white p-6 shadow-lg"
+        className="w-full max-w-md rounded-t-3xl bg-white/90 p-6 shadow-xl ring-1 ring-white/60 backdrop-blur-xl sm:rounded-3xl"
         onClick={(e) => e.stopPropagation()}
       >
-        <h2 className="mb-4 text-lg font-semibold text-slate-800">{title}</h2>
+        <h2 className="mb-4 text-lg font-bold text-slate-800">{title}</h2>
         {children}
       </div>
     </div>
@@ -103,4 +107,4 @@ export function Field({
 }
 
 export const inputClass =
-  "w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-emerald-400 focus:outline-none";
+  "w-full rounded-xl border border-white/70 bg-white/70 px-3 py-2 text-sm text-slate-800 focus:border-brand-400 focus:outline-none focus:ring-2 focus:ring-brand-200";

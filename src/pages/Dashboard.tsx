@@ -11,13 +11,21 @@ import {
   YAxis,
   Legend,
 } from "recharts";
-import { useAccounts, useHoldings, useTransactions, useCategories } from "../lib/queries";
+import {
+  useAccounts,
+  useHoldings,
+  useTransactions,
+  useCategories,
+  useBudgets,
+  useStockPrices,
+} from "../lib/queries";
 import { summarize, financialHealth } from "../lib/insights";
 import { formatMoney, formatDate } from "../lib/format";
 import { PageHeader, Card } from "../components/ui";
 import ReceiptUpload from "../features/receipt-upload/ReceiptUpload";
 
-const PIE_COLORS = ["#10b981", "#3b82f6", "#f59e0b", "#ef4444", "#8b5cf6", "#ec4899", "#14b8a6"];
+// Dải màu cam/amber theo gu peach của app.
+const PIE_COLORS = ["#f97316", "#fb923c", "#fbbf24", "#f59e0b", "#fdba74", "#fcd34d", "#fb7185"];
 
 function monthKey(iso: string) {
   return iso.slice(0, 7); // YYYY-MM
@@ -28,10 +36,15 @@ export default function Dashboard() {
   const { data: holdings = [] } = useHoldings();
   const { data: txs = [] } = useTransactions();
   const { data: categories = [] } = useCategories();
+  const { data: budgets = [] } = useBudgets();
+  const { data: prices = {} } = useStockPrices(holdings.map((h) => h.ticker));
 
   const cashTotal = accounts.reduce((s, a) => s + Number(a.current_balance), 0);
-  // Giá vốn tạm thay cho giá thị trường (Phase 5 sẽ nối giá realtime).
-  const investTotal = holdings.reduce((s, h) => s + Number(h.quantity) * Number(h.avg_cost), 0);
+  // Giá thị trường thật (fallback giá vốn khi chưa có giá).
+  const investTotal = holdings.reduce((s, h) => {
+    const px = prices[h.ticker.toUpperCase()]?.price ?? Number(h.avg_cost);
+    return s + Number(h.quantity) * px;
+  }, 0);
   const netWorth = cashTotal + investTotal;
 
   const thisMonth = new Date().toISOString().slice(0, 7);
@@ -60,9 +73,27 @@ export default function Dashboard() {
     }
     return months.map((m) => {
       const s = summarize(txs.filter((t) => monthKey(t.occurred_at) === m));
-      return { month: m.slice(5), "Thu": s.income, "Chi": s.expense };
+      return { month: m.slice(5), Thu: s.income, Chi: s.expense };
     });
   }, [txs]);
+
+  // Cảnh báo ngân sách: danh mục đã vượt hoặc sắp vượt (>=80%) tháng này.
+  const budgetAlerts = useMemo(() => {
+    const spent = new Map<string, number>();
+    for (const t of monthTxs) {
+      if (t.direction !== "out" || !t.category_id) continue;
+      spent.set(t.category_id, (spent.get(t.category_id) ?? 0) + Number(t.amount));
+    }
+    return budgets
+      .map((b) => {
+        const used = spent.get(b.category_id) ?? 0;
+        const cat = categories.find((c) => c.id === b.category_id);
+        const ratio = Number(b.monthly_limit) > 0 ? used / Number(b.monthly_limit) : 0;
+        return { name: cat?.name ?? "—", icon: cat?.icon ?? "", used, limit: Number(b.monthly_limit), ratio };
+      })
+      .filter((x) => x.ratio >= 0.8)
+      .sort((a, b) => b.ratio - a.ratio);
+  }, [budgets, monthTxs, categories]);
 
   const recent = txs.slice(0, 6);
   const healthColor =
@@ -80,11 +111,11 @@ export default function Dashboard() {
         </Card>
         <Card>
           <div className="text-sm text-slate-500">Tiền mặt</div>
-          <div className="mt-1 text-2xl font-bold text-emerald-600">{formatMoney(cashTotal)}</div>
+          <div className="mt-1 text-2xl font-bold text-brand-500">{formatMoney(cashTotal)}</div>
         </Card>
         <Card>
           <div className="text-sm text-slate-500">Đầu tư</div>
-          <div className="mt-1 text-2xl font-bold text-blue-600">{formatMoney(investTotal, "USD")}</div>
+          <div className="mt-1 text-2xl font-bold text-amber-500">{formatMoney(investTotal, "USD")}</div>
         </Card>
         <Card>
           <div className="text-sm text-slate-500">Sức khỏe tài chính (tháng)</div>
@@ -94,6 +125,29 @@ export default function Dashboard() {
           </div>
         </Card>
       </div>
+
+      {/* Cảnh báo ngân sách */}
+      {budgetAlerts.length > 0 && (
+        <Card className="mb-5">
+          <div className="mb-2 font-semibold text-slate-700">⚠️ Cảnh báo ngân sách tháng này</div>
+          <div className="space-y-2">
+            {budgetAlerts.map((a) => {
+              const over = a.ratio > 1;
+              return (
+                <div key={a.name} className="flex items-center justify-between text-sm">
+                  <span className="text-slate-600">
+                    {a.icon} {a.name}
+                  </span>
+                  <span className={over ? "font-semibold text-red-500" : "text-amber-500"}>
+                    {formatMoney(a.used)} / {formatMoney(a.limit)}{" "}
+                    {over ? "— Vượt chi 🔴" : `— ${Math.round(a.ratio * 100)}%`}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+        </Card>
+      )}
 
       {/* Thu/chi tháng này */}
       <div className="mb-5 grid gap-4 sm:grid-cols-3">
@@ -139,7 +193,7 @@ export default function Dashboard() {
               <YAxis hide />
               <Tooltip formatter={(v: number) => formatMoney(v)} />
               <Legend />
-              <Bar dataKey="Thu" fill="#10b981" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="Thu" fill="#f97316" radius={[4, 4, 0, 0]} />
               <Bar dataKey="Chi" fill="#ef4444" radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
@@ -152,7 +206,7 @@ export default function Dashboard() {
         {recent.length === 0 ? (
           <p className="text-sm text-slate-400">Chưa có giao dịch nào.</p>
         ) : (
-          <div className="divide-y divide-slate-100">
+          <div className="divide-y divide-black/5">
             {recent.map((t) => {
               const c = categories.find((x) => x.id === t.category_id);
               return (
@@ -163,9 +217,7 @@ export default function Dashboard() {
                     </span>
                     <span className="ml-2 text-xs text-slate-400">{formatDate(t.occurred_at)}</span>
                   </div>
-                  <span
-                    className={t.direction === "in" ? "text-emerald-600" : "text-red-500"}
-                  >
+                  <span className={t.direction === "in" ? "text-emerald-600" : "text-red-500"}>
                     {t.direction === "in" ? "+" : "−"}
                     {formatMoney(Number(t.amount))}
                   </span>

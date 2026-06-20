@@ -5,6 +5,7 @@ import { todayISO } from "../../lib/format";
 import { Button, Field, inputClass } from "../../components/ui";
 
 export interface TxDraft {
+  id?: string; // có id = sửa bản ghi cũ; không có = thêm mới
   amount: number;
   direction: Direction;
   account_id: string | null;
@@ -47,6 +48,7 @@ export default function TransactionForm({
   async function save() {
     if (!draft.amount) return;
     await upsert.mutateAsync({
+      ...(draft.id ? { id: draft.id } : {}),
       amount: draft.amount,
       direction: draft.direction,
       account_id: draft.account_id,

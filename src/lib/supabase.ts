@@ -6,17 +6,19 @@ import { createClient } from "@supabase/supabase-js";
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string | undefined;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined;
 
-if (!supabaseUrl || !supabaseAnonKey) {
-  // Báo lỗi rõ ràng khi quên cấu hình .env, tránh lỗi mơ hồ lúc runtime.
-  throw new Error(
-    "Thiếu VITE_SUPABASE_URL hoặc VITE_SUPABASE_ANON_KEY. " +
-      "Hãy sao chép .env.example thành .env và điền giá trị từ Supabase Dashboard.",
-  );
-}
+// Cờ kiểm tra đã cấu hình chưa. App sẽ hiện màn hình hướng dẫn (thay vì
+// trắng/crash) khi thiếu — quan trọng cho người dùng chưa rành setup.
+export const isSupabaseConfigured = Boolean(supabaseUrl && supabaseAnonKey);
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
-  auth: {
-    persistSession: true,
-    autoRefreshToken: true,
+// Dùng placeholder hợp lệ để createClient không ném lỗi lúc import khi chưa
+// cấu hình; client này không bao giờ được gọi vì App đã chặn ở SetupNeeded.
+export const supabase = createClient(
+  supabaseUrl ?? "https://placeholder.supabase.co",
+  supabaseAnonKey ?? "placeholder-anon-key",
+  {
+    auth: {
+      persistSession: true,
+      autoRefreshToken: true,
+    },
   },
-});
+);

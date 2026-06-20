@@ -29,10 +29,17 @@ export default function Login() {
     }
   }
 
+  const inputCls =
+    "w-full rounded-xl border border-white/70 bg-white/70 px-3 py-2.5 text-sm focus:border-brand-400 focus:outline-none focus:ring-2 focus:ring-brand-200";
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-slate-50 px-4">
-      <div className="w-full max-w-sm rounded-2xl bg-white p-8 shadow-sm ring-1 ring-slate-100">
-        <h1 className="mb-1 text-2xl font-bold text-emerald-600">💰 Money Flow</h1>
+    <div className="flex min-h-screen items-center justify-center px-4">
+      <div className="w-full max-w-sm rounded-3xl bg-white/70 p-8 shadow-[0_8px_40px_rgba(120,80,50,0.12)] ring-1 ring-white/60 backdrop-blur-xl">
+        <div className="mb-1 flex items-center gap-2 text-2xl font-extrabold">
+          <span>💰</span>
+          <span className="text-slate-800">Money</span>
+          <span className="text-brand-500">Flow</span>
+        </div>
         <p className="mb-6 text-sm text-slate-500">
           {mode === "signin" ? "Đăng nhập để quản lý tài chính" : "Tạo tài khoản mới"}
         </p>
@@ -44,7 +51,7 @@ export default function Login() {
             placeholder="Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-emerald-400 focus:outline-none"
+            className={inputCls}
           />
           <input
             type="password"
@@ -53,16 +60,16 @@ export default function Login() {
             placeholder="Mật khẩu (tối thiểu 6 ký tự)"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-emerald-400 focus:outline-none"
+            className={inputCls}
           />
 
           {error && <p className="text-sm text-red-500">{error}</p>}
-          {info && <p className="text-sm text-emerald-600">{info}</p>}
+          {info && <p className="text-sm text-brand-600">{info}</p>}
 
           <button
             type="submit"
             disabled={busy}
-            className="w-full rounded-lg bg-emerald-600 px-3 py-2 text-sm font-semibold text-white hover:bg-emerald-700 disabled:opacity-60"
+            className="w-full rounded-full bg-gradient-to-r from-brand-400 to-brand-500 px-3 py-2.5 text-sm font-semibold text-white shadow-md shadow-brand-500/20 transition hover:from-brand-500 hover:to-brand-600 disabled:opacity-60"
           >
             {busy ? "Đang xử lý…" : mode === "signin" ? "Đăng nhập" : "Đăng ký"}
           </button>
@@ -74,7 +81,7 @@ export default function Login() {
             setError(null);
             setInfo(null);
           }}
-          className="mt-4 w-full text-center text-sm text-slate-500 hover:text-emerald-600"
+          className="mt-4 w-full text-center text-sm text-slate-500 hover:text-brand-500"
         >
           {mode === "signin" ? "Chưa có tài khoản? Đăng ký" : "Đã có tài khoản? Đăng nhập"}
         </button>

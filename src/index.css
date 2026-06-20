@@ -1,12 +1,44 @@
 @import "tailwindcss";
 
+/* ── Design tokens (Tailwind v4) — gu peach + cam, glassmorphism ──
+   Tham khảo style "NIME GAMI": nền be ấm, nhấn cam gradient, thẻ kính mờ. */
+@theme {
+  --font-sans: "Poppins", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+
+  /* Cam chủ đạo (brand) */
+  --color-brand-50: #fff7ed;
+  --color-brand-100: #ffedd5;
+  --color-brand-200: #fed7aa;
+  --color-brand-400: #fb923c;
+  --color-brand-500: #f97316;
+  --color-brand-600: #ea6a0a;
+
+  /* Nền peach ấm */
+  --color-peach-50: #faf0e6;
+  --color-peach-100: #f6e7da;
+  --color-peach-200: #ead0bb;
+}
+
 :root {
   color-scheme: light;
 }
 
 body {
   margin: 0;
-  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  background-color: #f8fafc;
-  color: #0f172a;
+  font-family: var(--font-sans);
+  color: #1e293b;
+  /* Nền gradient peach ấm, phủ kín viewport kể cả khi cuộn */
+  background: linear-gradient(135deg, #f6e7da 0%, #ead0bb 100%);
+  background-attachment: fixed;
+  min-height: 100vh;
+}
+
+/* Thanh cuộn mảnh cho hợp tông sáng */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(148, 116, 90, 0.35);
+  border-radius: 9999px;
 }

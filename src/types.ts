@@ -58,6 +58,22 @@ export interface Receipt {
   created_at: string;
 }
 
+export interface Budget {
+  id: string;
+  user_id: string;
+  category_id: string;
+  monthly_limit: number;
+  currency: string;
+  created_at: string;
+}
+
+export interface PriceQuote {
+  ticker: string;
+  price: number;
+  currency: string;
+  as_of: string;
+}
+
 // Cấu trúc JSON mà Edge Function (Claude vision) trả về.
 export interface ExtractedReceipt {
   amount: number | null;

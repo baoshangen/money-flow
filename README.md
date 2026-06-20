@@ -22,9 +22,10 @@ npm run dev
 1. Tạo project tại https://supabase.com → vào **Project Settings → API** lấy:
    - `Project URL` → `VITE_SUPABASE_URL`
    - `anon public` key → `VITE_SUPABASE_ANON_KEY`
-2. Tạo schema: mở **SQL Editor**, dán nội dung [`supabase/migrations/0001_init.sql`](supabase/migrations/0001_init.sql) và **Run**.
+2. Tạo schema: mở **SQL Editor**, chạy lần lượt 2 file:
+   [`supabase/migrations/0001_init.sql`](supabase/migrations/0001_init.sql) (bảng lõi + RLS + seed danh mục + bucket `receipts`)
+   rồi [`supabase/migrations/0002_prices_budgets.sql`](supabase/migrations/0002_prices_budgets.sql) (bảng `price_cache` + `budgets`).
    (Hoặc dùng CLI: `supabase link` rồi `supabase db push`.)
-   - Lệnh này tạo bảng, bật RLS, seed danh mục mặc định, và tạo bucket `receipts` (private).
 
 ## 3. Bật tính năng AI đọc ảnh (Edge Function)
 
@@ -38,6 +39,12 @@ supabase secrets set ANTHROPIC_API_KEY=sk-ant-xxxx   # KEY chỉ ở server, kh�
 
 Lấy `ANTHROPIC_API_KEY` tại https://console.anthropic.com (tính phí riêng theo từng ảnh).
 Mặc định dùng model `claude-haiku-4-5`; đổi bằng `supabase secrets set CLAUDE_MODEL=claude-opus-4-8`.
+
+Deploy thêm function lấy **giá cổ phiếu** (miễn phí qua Stooq, không cần key):
+
+```bash
+supabase functions deploy stock-prices
+```
 
 ## 4. Build & deploy lên Hostinger
 

@@ -37,7 +37,7 @@ export default function Accounts() {
 
       <Card className="mb-5">
         <div className="text-sm text-slate-500">Tổng tiền mặt</div>
-        <div className="text-3xl font-bold text-emerald-600">{formatMoney(total)}</div>
+        <div className="text-3xl font-bold text-brand-500">{formatMoney(total)}</div>
       </Card>
 
       {isLoading ? (

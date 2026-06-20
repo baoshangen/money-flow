@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "./supabase";
-import type { Account, Category, Holding, Transaction } from "../types";
+import type { Account, Budget, Category, Holding, PriceQuote, Transaction } from "../types";
 
 // ── Accounts ────────────────────────────────────────────────
 export function useAccounts() {
@@ -141,5 +141,62 @@ export function useDeleteHolding() {
       if (error) throw error;
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["holdings"] }),
+  });
+}
+
+// ── Budgets (ngân sách) ─────────────────────────────────────
+export function useBudgets() {
+  return useQuery({
+    queryKey: ["budgets"],
+    queryFn: async (): Promise<Budget[]> => {
+      const { data, error } = await supabase.from("budgets").select("*");
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+}
+
+export function useUpsertBudget() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (b: Partial<Budget>) => {
+      // onConflict theo (user_id, category_id): set lại hạn mức nếu đã có.
+      const { error } = await supabase
+        .from("budgets")
+        .upsert(b, { onConflict: "user_id,category_id" });
+      if (error) throw error;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["budgets"] }),
+  });
+}
+
+export function useDeleteBudget() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from("budgets").delete().eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["budgets"] }),
+  });
+}
+
+// ── Giá cổ phiếu (Edge Function stock-prices + cache) ───────
+export function useStockPrices(tickers: string[]) {
+  const key = [...tickers].sort().join(",");
+  return useQuery({
+    queryKey: ["prices", key],
+    enabled: tickers.length > 0,
+    staleTime: 5 * 60_000, // giá ít đổi trong vài phút
+    queryFn: async (): Promise<Record<string, PriceQuote>> => {
+      const { data, error } = await supabase.functions.invoke<{ prices: PriceQuote[] }>(
+        "stock-prices",
+        { body: { tickers } },
+      );
+      if (error) throw error;
+      const map: Record<string, PriceQuote> = {};
+      for (const p of data?.prices ?? []) map[p.ticker.toUpperCase()] = p;
+      return map;
+    },
   });
 }
