@@ -9,6 +9,7 @@ import { formatMoney, formatDate } from "../lib/format";
 import { PageHeader, Card, Button, Modal } from "../components/ui";
 import TransactionForm, { emptyDraft, type TxDraft } from "../features/transactions/TransactionForm";
 import ReceiptUpload from "../features/receipt-upload/ReceiptUpload";
+import ImportCsv from "../features/import-csv/ImportCsv";
 import type { Transaction } from "../types";
 
 export default function Transactions() {
@@ -41,7 +42,8 @@ export default function Transactions() {
       <PageHeader
         title="Giao dịch"
         action={
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
+            <ImportCsv />
             <ReceiptUpload />
             <Button onClick={() => setEditing(emptyDraft())}>+ Nhập tay</Button>
           </div>
