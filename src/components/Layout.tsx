@@ -11,7 +11,7 @@ const nav = [
 
 function Brand() {
   return (
-    <div className="flex items-center gap-2 text-xl font-extrabold tracking-tight">
+    <div className="flex items-center gap-2 font-display text-xl font-bold tracking-tight">
       <span>💰</span>
       <span className="text-slate-800">Money</span>
       <span className="text-brand-500">Flow</span>
@@ -24,6 +24,10 @@ export default function Layout() {
 
   return (
     <div className="flex min-h-screen">
+      {/* Đốm gradient mềm trang trí nền (teen, không cản thao tác) */}
+      <div className="pointer-events-none fixed -left-20 -top-20 h-72 w-72 rounded-full bg-brand-200/40 blur-3xl" />
+      <div className="pointer-events-none fixed -bottom-24 right-0 h-80 w-80 rounded-full bg-amber-200/40 blur-3xl" />
+
       {/* Sidebar — chỉ hiện trên desktop */}
       <aside className="hidden w-60 flex-col border-r border-white/50 bg-white/40 backdrop-blur-md lg:flex">
         <div className="px-5 py-5">

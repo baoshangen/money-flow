@@ -4,6 +4,8 @@
    Tham khảo style "NIME GAMI": nền be ấm, nhấn cam gradient, thẻ kính mờ. */
 @theme {
   --font-sans: "Poppins", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  /* Font bo tròn vui cho tiêu đề/brand — chất "teen" */
+  --font-display: "Fredoka", "Poppins", system-ui, sans-serif;
 
   /* Cam chủ đạo (brand) */
   --color-brand-50: #fff7ed;

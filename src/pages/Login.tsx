@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from "react";
 import { Navigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
+import { Mascot, Sparkles } from "../components/Decor";
 
 export default function Login() {
   const { session, signIn, signUp } = useAuth();
@@ -34,13 +35,19 @@ export default function Login() {
 
   return (
     <div className="flex min-h-screen items-center justify-center px-4">
-      <div className="w-full max-w-sm rounded-3xl bg-white/70 p-8 shadow-[0_8px_40px_rgba(120,80,50,0.12)] ring-1 ring-white/60 backdrop-blur-xl">
-        <div className="mb-1 flex items-center gap-2 text-2xl font-extrabold">
+      <div className="relative w-full max-w-sm overflow-hidden rounded-3xl bg-white/70 p-8 shadow-[0_8px_40px_rgba(120,80,50,0.12)] ring-1 ring-white/60 backdrop-blur-xl">
+        <Sparkles className="absolute inset-0" />
+        <div className="relative mb-2 flex justify-center">
+          <div className="rounded-full bg-gradient-to-br from-brand-100 to-brand-200 p-2 ring-4 ring-white/70">
+            <Mascot name="happy" className="h-24 w-24" alt="Mascot Money Flow" />
+          </div>
+        </div>
+        <div className="mb-1 flex items-center justify-center gap-2 font-display text-2xl font-bold">
           <span>💰</span>
           <span className="text-slate-800">Money</span>
           <span className="text-brand-500">Flow</span>
         </div>
-        <p className="mb-6 text-sm text-slate-500">
+        <p className="relative mb-6 text-center text-sm text-slate-500">
           {mode === "signin" ? "Đăng nhập để quản lý tài chính" : "Tạo tài khoản mới"}
         </p>
 

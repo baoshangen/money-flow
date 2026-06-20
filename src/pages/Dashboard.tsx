@@ -21,7 +21,8 @@ import {
 } from "../lib/queries";
 import { summarize, financialHealth } from "../lib/insights";
 import { formatMoney, formatDate } from "../lib/format";
-import { Card, CircleBadge } from "../components/ui";
+import { Card } from "../components/ui";
+import { Mascot, SpeedLines, Sparkles, Sticker } from "../components/Decor";
 import { useAuth } from "../contexts/AuthContext";
 import ReceiptUpload from "../features/receipt-upload/ReceiptUpload";
 
@@ -119,15 +120,22 @@ export default function Dashboard() {
               Xin chào, {user?.email?.split("@")[0] ?? "bạn"} 👋
             </div>
             <div className="mt-1 text-xs uppercase tracking-wide text-white/70">Tài sản ròng</div>
-            <div className="text-3xl font-extrabold sm:text-4xl">{formatMoney(netWorth)}</div>
+            <div className="font-display text-3xl font-bold sm:text-4xl">{formatMoney(netWorth)}</div>
+            <div className="mt-2">
+              <Sticker>💰 Tiết kiệm {Math.round(health.savingsRate * 100)}%</Sticker>
+            </div>
             <div className="mt-3">
               <ReceiptUpload label="📷 Up ảnh hóa đơn" variant="white" />
             </div>
           </div>
-          <div className="hidden sm:block">
-            <CircleBadge value={`${Math.round(health.savingsRate * 100)}%`} caption="tiết kiệm" />
+
+          {/* Mascot + tia tốc độ — chỗ "nhân vật" như ảnh mẫu */}
+          <div className="relative hidden h-32 w-32 shrink-0 sm:block">
+            <SpeedLines className="inset-0 h-full w-full" />
+            <Mascot name="hero" className="relative z-10 mx-auto h-32 w-32 drop-shadow-lg" />
           </div>
         </div>
+        <Sparkles className="absolute inset-0" />
       </div>
 
       {/* Hàng thẻ tổng */}
@@ -190,7 +198,10 @@ export default function Dashboard() {
         <Card>
           <div className="mb-3 font-semibold text-slate-700">Chi tiêu theo danh mục (tháng này)</div>
           {byCategory.length === 0 ? (
-            <p className="py-10 text-center text-sm text-slate-400">Chưa có chi tiêu tháng này.</p>
+            <div className="flex flex-col items-center py-8 text-center">
+              <Mascot name="empty" className="h-20 w-20 opacity-90" />
+              <p className="mt-2 text-sm text-slate-400">Chưa có chi tiêu tháng này — thêm giao dịch nhé! ✨</p>
+            </div>
           ) : (
             <ResponsiveContainer width="100%" height={240}>
               <PieChart>
@@ -224,7 +235,12 @@ export default function Dashboard() {
       <Card>
         <div className="mb-3 font-semibold text-slate-700">Giao dịch gần đây</div>
         {recent.length === 0 ? (
-          <p className="text-sm text-slate-400">Chưa có giao dịch nào.</p>
+          <div className="flex flex-col items-center py-6 text-center">
+            <Mascot name="happy" className="h-20 w-20" />
+            <p className="mt-2 text-sm text-slate-400">
+              Chưa có giao dịch nào. Bấm 📷 hoặc “+ Nhập tay” để bắt đầu!
+            </p>
+          </div>
         ) : (
           <div className="divide-y divide-black/5">
             {recent.map((t) => {
