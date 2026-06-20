@@ -1,7 +1,6 @@
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 
 // Mảnh trang trí "teen" tái dùng: mascot, sparkle, tia tốc độ kiểu manga, sticker.
-// Mascot là avatar mở (DiceBear, CC0) đã tải về public/mascot — không phụ thuộc mạng.
 
 export function Mascot({
   name = "hero",
@@ -12,8 +11,21 @@ export function Mascot({
   className?: string;
   alt?: string;
 }) {
-  // base "./" trong vite.config → dùng đường dẫn tương đối cho Hostinger.
-  return <img src={`mascot/${name}.svg`} alt={alt} className={className} draggable={false} />;
+  // Ưu tiên ảnh BẠN tự bỏ vào public/mascot/custom/<name>.png (thư mục này bị
+  // Git bỏ qua → chỉ ở máy bạn, không bao giờ lên GitHub/Hostinger).
+  // Nếu không có file đó → tự rớt về mascot mở mặc định (CC0) cho bản công khai.
+  const [src, setSrc] = useState(`mascot/custom/${name}.png`);
+  return (
+    <img
+      src={src}
+      onError={() => {
+        if (!src.endsWith(".svg")) setSrc(`mascot/${name}.svg`);
+      }}
+      alt={alt}
+      className={className}
+      draggable={false}
+    />
+  );
 }
 
 // Vài ngôi sao/sparkle rải (thuần CSS, nhẹ).

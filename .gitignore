@@ -23,3 +23,6 @@ Thumbs.db
 
 # Supabase local
 supabase/.temp/
+
+# Ảnh mascot tự thêm (chỉ dùng máy cá nhân, KHÔNG đẩy lên GitHub/Hostinger)
+public/mascot/custom/
