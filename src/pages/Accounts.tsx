@@ -19,7 +19,7 @@ export default function Accounts() {
   const total = accounts.reduce((s, a) => s + Number(a.current_balance), 0);
 
   function openNew() {
-    setEditing({ name: "", type: "bank_card", currency: "VND", current_balance: 0 });
+    setEditing({ name: "", type: "bank_card", currency: "USD", current_balance: 0 });
   }
 
   async function save() {
@@ -108,7 +108,7 @@ export default function Accounts() {
               <Field label="Tiền tệ">
                 <input
                   className={inputClass}
-                  value={editing.currency ?? "VND"}
+                  value={editing.currency ?? "USD"}
                   onChange={(e) => setEditing({ ...editing, currency: e.target.value })}
                 />
               </Field>

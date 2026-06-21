@@ -235,7 +235,7 @@ export default function ImportCsv() {
                     <span className="text-slate-700">{tx.note}</span>
                     <span className={tx.direction === "in" ? "text-emerald-600" : "text-red-500"}>
                       {tx.direction === "in" ? "+" : "−"}
-                      {tx.amount.toLocaleString("vi-VN")}
+                      {tx.amount.toLocaleString("en-US")}
                     </span>
                   </div>
                 );

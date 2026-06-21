@@ -41,7 +41,7 @@ export default function Budgets() {
 
   async function save() {
     if (!editCat) return;
-    await upsert.mutateAsync({ category_id: editCat, monthly_limit: limit, currency: "VND" });
+    await upsert.mutateAsync({ category_id: editCat, monthly_limit: limit, currency: "USD" });
     setEditCat(null);
   }
 
@@ -115,13 +115,13 @@ export default function Budgets() {
 
       <Modal open={!!editCat} onClose={() => setEditCat(null)} title="Đặt hạn mức tháng">
         <div className="space-y-3">
-          <Field label="Hạn mức chi (VND/tháng)">
+          <Field label="Hạn mức chi (USD/tháng)">
             <input
               type="number"
               className={inputClass}
               value={limit || ""}
               onChange={(e) => setLimit(Number(e.target.value))}
-              placeholder="VD: 3000000"
+              placeholder="VD: 500"
             />
           </Field>
           <div className="flex justify-end gap-2 pt-2">

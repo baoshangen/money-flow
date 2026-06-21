@@ -1,15 +1,17 @@
 // Hàm định dạng tiền tệ & ngày dùng chung toàn app.
 
-export function formatMoney(amount: number, currency = "VND"): string {
+export function formatMoney(amount: number, currency = "USD"): string {
+  // USD hiển thị kiểu $1,234.56 (en-US); VND kiểu 1.234 ₫ (vi-VN).
+  const locale = currency === "VND" ? "vi-VN" : "en-US";
   try {
-    return new Intl.NumberFormat("vi-VN", {
+    return new Intl.NumberFormat(locale, {
       style: "currency",
       currency,
       maximumFractionDigits: currency === "VND" ? 0 : 2,
     }).format(amount);
   } catch {
     // Phòng khi mã tiền tệ lạ Intl không nhận.
-    return `${amount.toLocaleString("vi-VN")} ${currency}`;
+    return `${amount.toLocaleString(locale)} ${currency}`;
   }
 }
 
