@@ -1,6 +1,14 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "./supabase";
-import type { Account, Budget, Category, Holding, PriceQuote, Transaction } from "../types";
+import type {
+  Account,
+  Budget,
+  Category,
+  Holding,
+  PriceQuote,
+  TargetHolding,
+  Transaction,
+} from "../types";
 
 // ── Accounts ────────────────────────────────────────────────
 export function useAccounts() {
@@ -141,6 +149,43 @@ export function useDeleteHolding() {
       if (error) throw error;
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["holdings"] }),
+  });
+}
+
+// ── Target holdings (danh mục mẫu để bám theo) ──────────────
+export function useTargetHoldings() {
+  return useQuery({
+    queryKey: ["target_holdings"],
+    queryFn: async (): Promise<TargetHolding[]> => {
+      const { data, error } = await supabase
+        .from("target_holdings")
+        .select("*")
+        .order("weight", { ascending: false });
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+}
+
+export function useUpsertTargetHolding() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (t: Partial<TargetHolding>) => {
+      const { error } = await supabase.from("target_holdings").upsert(t);
+      if (error) throw error;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["target_holdings"] }),
+  });
+}
+
+export function useDeleteTargetHolding() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from("target_holdings").delete().eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["target_holdings"] }),
   });
 }
 

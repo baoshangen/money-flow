@@ -8,6 +8,7 @@ import Dashboard from "./pages/Dashboard";
 import Transactions from "./pages/Transactions";
 import Accounts from "./pages/Accounts";
 import Portfolio from "./pages/Portfolio";
+import Compare from "./pages/Compare";
 import Budgets from "./pages/Budgets";
 import SetupNeeded from "./pages/SetupNeeded";
 
@@ -40,6 +41,7 @@ export default function App() {
         <Route path="/budgets" element={<Budgets />} />
         <Route path="/accounts" element={<Accounts />} />
         <Route path="/portfolio" element={<Portfolio />} />
+        <Route path="/compare" element={<Compare />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

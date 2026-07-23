@@ -49,6 +49,16 @@ export interface Holding {
   created_at: string;
 }
 
+// Danh mục mẫu "để noi theo" (VD: của anh/chị) — chỉ lưu tỷ trọng %.
+export interface TargetHolding {
+  id: string;
+  user_id: string;
+  ticker: string;
+  weight: number; // tỷ trọng mục tiêu, đơn vị %
+  label: string | null;
+  created_at: string;
+}
+
 export interface Receipt {
   id: string;
   user_id: string;

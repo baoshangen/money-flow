@@ -7,6 +7,7 @@ const nav = [
   { to: "/budgets", label: "Ngân sách", icon: "🎯", end: false },
   { to: "/accounts", label: "Thẻ", icon: "💳", end: false },
   { to: "/portfolio", label: "Cổ phiếu", icon: "📈", end: false },
+  { to: "/compare", label: "Bám DM", icon: "🎯", end: false },
 ];
 
 function Brand() {
