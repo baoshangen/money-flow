@@ -4,6 +4,10 @@ import { todayISO } from "../../lib/format";
 import { Button, Modal, Field, inputClass } from "../../components/ui";
 import type { Direction } from "../../types";
 
+// Trần chống quá tải (CWE-400/770): file nặng + spam DB 1 mutation/dòng.
+const MAX_CSV_BYTES = 2 * 1024 * 1024; // 2 MB
+const MAX_ROWS = 5000; // số giao dịch tối đa nhập 1 lần
+
 // Parser CSV gọn: hỗ trợ dấu phân tách , hoặc ; và ô có dấu ngoặc kép.
 function parseCsv(text: string, delim: string): string[][] {
   const rows: string[][] = [];
@@ -68,6 +72,14 @@ export default function ImportCsv() {
   const [done, setDone] = useState<number | null>(null);
 
   function handleFile(file: File) {
+    if (file.size > MAX_CSV_BYTES) {
+      alert(
+        `File quá lớn (${(file.size / 1024 / 1024).toFixed(1)}MB). Giới hạn ${
+          MAX_CSV_BYTES / 1024 / 1024
+        }MB — hãy chia nhỏ file CSV rồi nhập từng phần.`,
+      );
+      return;
+    }
     const reader = new FileReader();
     reader.onload = () => {
       const text = String(reader.result ?? "");
@@ -84,6 +96,9 @@ export default function ImportCsv() {
   const rows = useMemo(() => (rawText ? parseCsv(rawText, delim) : []), [rawText, delim]);
   const dataRows = hasHeader ? rows.slice(1) : rows;
   const header = hasHeader && rows[0] ? rows[0] : rows[0]?.map((_, i) => `Cột ${i + 1}`) ?? [];
+  // Chỉ nhập tối đa MAX_ROWS dòng đầu để tránh spam DB.
+  const importRows = dataRows.slice(0, MAX_ROWS);
+  const tooMany = dataRows.length > MAX_ROWS;
 
   // Suy ra chiều thu/chi: nếu số âm → ngược lại default; mặc định theo lựa chọn.
   function rowToTx(r: string[]) {
@@ -103,7 +118,7 @@ export default function ImportCsv() {
   async function doImport() {
     setBusy(true);
     let ok = 0;
-    for (const r of dataRows) {
+    for (const r of importRows) {
       const tx = rowToTx(r);
       if (!tx.amount) continue; // bỏ dòng không có số tiền hợp lệ
       try {
@@ -242,12 +257,19 @@ export default function ImportCsv() {
               })}
             </div>
 
+            {tooMany && (
+              <p className="text-xs text-amber-600">
+                ⚠️ File có {dataRows.length} dòng — chỉ nhập {MAX_ROWS} dòng đầu (giới hạn
+                chống quá tải). Chia nhỏ file nếu cần nhập hết.
+              </p>
+            )}
+
             <div className="flex justify-end gap-2 pt-1">
               <Button variant="ghost" onClick={() => setOpen(false)}>
                 Hủy
               </Button>
-              <Button onClick={doImport} disabled={busy || dataRows.length === 0}>
-                {busy ? "Đang nhập…" : `Nhập ${dataRows.length} dòng`}
+              <Button onClick={doImport} disabled={busy || importRows.length === 0}>
+                {busy ? "Đang nhập…" : `Nhập ${importRows.length} dòng`}
               </Button>
             </div>
           </div>

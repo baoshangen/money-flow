@@ -8,6 +8,9 @@ import TransactionForm, { type TxDraft, emptyDraft } from "../transactions/Trans
 
 type Phase = "idle" | "uploading" | "extracting" | "review" | "error";
 
+// Chặn quá tải storage (CWE-400/770): chỉ nhận ảnh, giới hạn dung lượng.
+const MAX_RECEIPT_BYTES = 8 * 1024 * 1024; // 8 MB
+
 export default function ReceiptUpload({
   label = "📷 Up ảnh hóa đơn",
   variant = "primary",
@@ -35,6 +38,21 @@ export default function ReceiptUpload({
   async function handleFile(file: File) {
     if (!user) return;
     setErrorMsg(null);
+    // Chặn từ client (phòng thủ ngoài `accept`, vẫn nên siết thêm ở server/bucket).
+    if (!file.type.startsWith("image/")) {
+      setErrorMsg("Chỉ nhận file ảnh (jpg/png/heic…).");
+      setPhase("error");
+      return;
+    }
+    if (file.size > MAX_RECEIPT_BYTES) {
+      setErrorMsg(
+        `Ảnh quá lớn (${(file.size / 1024 / 1024).toFixed(1)}MB). Giới hạn ${
+          MAX_RECEIPT_BYTES / 1024 / 1024
+        }MB — hãy chụp/nén nhỏ lại.`,
+      );
+      setPhase("error");
+      return;
+    }
     try {
       // 1) Upload ảnh lên bucket private `receipts`, đặt theo userId để RLS chặn đúng.
       setPhase("uploading");
